@@ -1,0 +1,422 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  margin: 0; padding: 0;  /* to avoid scrollbars */
+}
+
+body {
+	padding: 0px;
+	border: 0px;
+	font-family: Avenir, sans-serif;
+	height: 100%;
+}
+
+div.top_banner {
+	position: fixed;
+	top: 0;
+	z-index: 20;
+	display: block;
+	height: 60px;
+	background-color: black;
+	width: 100%;
+    color: white;
+    margin-left: 30;
+}
+
+ h1.top_banner {
+	padding-top: 20px;
+	padding-left: 40px;
+	font-size: 22px;
+	float: left;
+	height: 30px;
+}
+
+h3 {
+	padding-top: 20px;
+}
+
+
+nav {
+	position: fixed;
+	top: 60px;
+	z-index: 10;
+	background-color: rgb(128, 19, 35);
+	height: 50px;
+	color: white;
+	width: 100%;
+}
+
+a:visited {
+  color: rgb(227, 221, 233);
+}
+
+ul {
+	list-style-type: none;
+	font-size: 14px;
+}
+
+li {
+	float: left;
+	height: 50px;
+	width: 25%;
+	text-align: center;
+	line-height: 50px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.explan {
+  padding-top: 30px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  padding-left: 80px;
+  font-size: .9em;
+}
+
+.new-sxn {
+  padding-top: 0px;
+  padding-right: 30px;
+  padding-bottom: 0px;
+  padding-left: 80px;
+  font-size: .9em;
+}
+
+
+#ghost-infections {
+	padding-left: 80px;
+}
+
+#IOcontainer {
+	/* overflow: hidden; */
+}
+#input-form {
+	margin-top: 30px;
+	margin-left: 30px;
+	padding-top: 10px;
+	font-family: Avenir, sans-serif;
+	font-size: 15px;
+
+	/* padding-top: 30px; */
+	/* background: pink; */
+	height: 150px;
+}
+
+#output-form {
+	margin-top: 30px;
+	margin-left: 30px;
+	padding-top: 10px;
+	font-family: Avenir, sans-serif;
+	font-size: 15px;
+	height: 150px;
+	/* clear: both; */
+}
+#input {
+  padding-top: 0px;
+  padding-right: 30px;
+  padding-bottom: 30px;
+  padding-left: 80px;
+  font-size: .9em;
+  line-height: 2em;
+  /* background: rgb(107, 5, 5); */
+  width: 40%;
+  height: 200px;
+  float: left;
+}
+ 
+#output {
+	padding-top: 0px;
+  	padding-right: 30px;
+  	padding-bottom: 30px;
+	margin-left: 30px;
+	width: 40%;
+	height: 200px;
+	/* background: rgb(39, 8, 124); */
+	float: left;
+}
+
+.button {
+  /* position: absolute; */
+  float: left;
+  background-color: #2c0b85;
+  color: white;
+  /* padding: 15px 32px; */
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  font-size: 16px;
+  margin-top: 10px;
+  width: 190px;
+  float: none;
+}
+
+.risk-input {
+	height: 20px;
+	font-size: 15px;
+}
+
+.risk-output {
+	height: 20px;
+	font-size: 15px;
+}
+
+.tree {
+	background: pink;
+}
+
+.node circle {
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 3px;
+}
+
+.node text { font: 12px sans-serif; }
+
+.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 2px;
+
+.risk-label {
+	background:none;
+}
+
+.risk-output {
+	height: 20px;
+	font-size: 1.2em;
+}
+
+label {
+	display: inline-block;
+	/* color: white; */
+	background-color: rgb(107, 5, 5);
+}
+
+#bar-div {
+	margin-left: 80px;
+}
+
+
+
+.explan .p {
+    padding-left: .4em
+}
+
+div #outcomes_piechart {
+  width: 60%;
+  padding-top: 0px;
+  padding-right: 30px;
+  padding-bottom: 0px;
+  padding-left: 120px;
+  background: pink;
+  float: left;
+}
+
+div.footnotes {
+  margin-left: 80px;
+  padding-top: 0px;
+  padding-right: 30px;
+  padding-bottom: 0px;
+  padding-left: 80px;
+  font-size: .7em;
+  background: pink;
+}
+
+.img {
+    padding-left: 100px;
+}
+
+
+.dropdown:hover {
+	background-color: rgb(128, 19, 35);
+	font-weight: bold;
+  cursor: pointer;
+}
+
+.dropdown_content {
+	display: none;
+	position: absolute;
+	background-color: rgb(119, 19, 35);
+	z-index: 30;
+	width: 100%;
+}
+
+.dropdown:hover .dropdown_content {
+	display: block;
+  cursor: pointer;
+}
+
+.dropdown_content a {
+	display: block;
+	width: 100%;
+	padding: 0;
+}
+
+.dropdown_content a:hover {
+	background-color: rgb(97, 55, 66);
+	font-weight: 999;
+  cursor: pointer;
+}
+
+li a {
+  display: inline-block;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  padding: 5px;
+  font-family: "Avenir";
+  font-size: 12px;
+}
+
+
+/*Hide dropdown links until they are needed*/
+li ul {
+  display: hidden;
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+/*Make dropdown links vertical*/
+li ul li {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
+main {
+	position: absolute;
+	/* top: 110px; */
+	box-sizing: border-box;
+	min-height: 100%;
+	background-color: rgb(255, 255, 250);
+	overflow-y: scroll;
+	width: 100%;
+  	padding-bottom: 70px;
+}
+
+.main_container{
+	display: block;
+	width: 90%;
+	padding:5%;
+	min-height: 900px;
+}
+
+.leftside_image {
+	float: left;
+	width: 45%;
+	padding: 2.5%;
+	height: auto%;
+}
+
+.right_side_text {
+	width: 45%;
+	padding: 2.5%;
+	display: block;
+	float: right;
+	height: auto%;
+	flex-shrink: 1;
+	overflow: auto;
+}
+
+.right_side_text p {
+	padding-top: .4em;
+	padding-bottom: .4em;
+	font-size: 1em;
+}
+
+div.tooltip {
+	position: absolute; 
+	left: 400px;
+	text-align: left;
+	/* width: 150px; */
+	/* width: 30%; */
+	height: 40px;
+	padding: 2px;
+	font: 12px sans-serif; 
+	background: lightsteelblue; 
+	border: 4px; 
+	border-radius: 8px; pointer-events: none;
+	/* display: inline;
+	float: right; */
+	color: white;
+}
+
+@media only screen and (max-width: 700px) {
+	.main_container {
+		width: 90%;
+		padding: 5%;
+	}
+	.leftside_image, .right_side_text {
+		width: 90%;
+		padding: 5%;
+		height: auto;
+		float: left;
+	}
+}
+
+/* @media only screen and (max-width: 400px) {
+	.main_container {
+		width: 80%;
+		padding: 10%;
+	}
+		.leftside_image, .right_side_text {
+		width: 100%;
+		height: auto;
+		float: none;
+	}
+} */
+
+footer {
+	position: fixed;
+	width: 100%;
+	left: 0;
+	bottom: 0;
+	height: 60px;
+	background-color: black;
+}
+
+footer ul {
+	height: 50px;
+	margin: 0;
+}
+
+footer ul li {
+	display: inline-block;
+	float-left;
+	margin: 0;
+	width: auto;
+}
+
+footer li a {
+	font-size: 1em;
+	line-height: 60px;
+	padding: 3px 10px 3px 10px;
+}
+
+footer li a:hover {
+	background-color: rgb(33, 28, 28)
+  cursor: pointer;
+}
+
+footer #logo {
+	height: 40px;
+	padding-top: 10px;
+	float: right;
+	padding-right: 5px;
+	position: absolute;
+    right: 20px;
+}
+
+footer #service {
+	height: 55px;
+    float: right;
+    position: absolute;
+    right: 80px;
+    max-width: 50%;
+}

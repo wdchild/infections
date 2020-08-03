@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID NON-SYMPTOMATIC INFECTIONS</title>
+    <link rel="stylesheet" type="text/css" href="alternate.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="margins.rtf">
+    <!-- <link rel="stylesheet" type="text/css" href="alternate.css">
+
+    <link rel="stylesheet" type="text/css" href="main.css"> -->
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+    <!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+    <!-- d3-array used to get maxIndex of the data -->
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+    <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="top_banner">
+            <h1 class="top_banner">Estimating the Risk of COVID-19 Exposure</h1>
+        </div>
+        <nav>
+            <ul>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="index.html">(1) Purpose >> </a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="parameters.html">(2) Estimation Logic >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="zombies.html">(3) Non-Symptomatic Infections >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="risk.html">(4) Exposure Risk</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+    <div class="explan">
+        <h3>Extrapolated Ghost Infections</h3>
+        <p>Using the estimated time course of the disease at various stages, we can estimate the number of ghost infections in the U.S.since the beginning of the pandemic based on the new case reports.</p>
+        <br>
+        <p>As shown the the graph, there are three distinct phase: (1) an initial rise in infections as the authorities struggle to grapple with the pandemic; (2) a phase of decline, where most states implement a strict quarantine; and (3) a phase of rapid increase where premature reopening and fatigue with quarantining procedures leads people to take less stringent measures to stem the pandemic.</p>
+    </div>
+    <div id="ghost-infections"></div>
+    </main>
+    <script type="text/javascript">
+            var source = "/data/ghost_infections.csv"
+
+            // CHART DIMENSIONS
+            var margin = { top: 50, right: 70, bottom: 50, left: 70 },
+                    width = 700 - margin.left - margin.right,
+                    height = 500 - margin.top - margin.bottom;
+            var x_axis_h = height + margin.top;
+            var y_right_w = width + margin.left;
+
+
+            // var the_data = 
+            d3.csv(source).then(function(data) {
+                data.forEach(function (d) {
+                    d.date = d3.timeParse("%Y-%m-%d")(d.date); // coerce to date
+                    d.infections = +d.infections; // coerce to number
+                });
+                
+                // GET SUMMARY STATISTICS
+                var minInfections = d3.min(data, function (d) { return d.infections; });
+                console.log('Min infections: ', minInfections);                
+                var maxInfections = d3.max(data, function (d) { return d.infections; });
+                console.log('Max infections: ', maxInfections);
+                var minDate = d3.min(data, function (d) { return d.date; });
+                console.log('Earliest date: ', minDate);
+                var maxDate = d3.max(data, function (d) { return d.date; });
+                console.log('Latest date: ', maxDate);
+                var medianInfections = d3.median(data, function (d) { return d.infections; });
+                console.log('Median infections: ', medianInfections);
+                var meanInfections = d3.mean(data, function (d) { return d.infections; }).toFixed(0);
+                console.log('Mean infections: ', meanInfections);
+                console.log('Num days: ', data.length);
+                var maxIndex = d3.maxIndex(data, function (d) { return d.infections; });
+                var worstDate = data[maxIndex].date;
+                console.log('The worst date was ', worstDate, ' with ', maxInfections, ' infections.');
+                // FILTER NOT WORKING CORRECTLY
+                // var worstPositives = data.filter(function (d) { return ((d.date < worstDate) && (d.date >= worstDate.getDate() - 15)); });
+                // console.log(worstPositives.length);
+
+                // HORIZONTAL AXIS POSITIONS, SCALED FROM MIN TO MAX DATE
+                var startGraphDate = new Date('2020, 0, 1');
+                var endGraphDate = new Date('2020, 8, 1');
+                console.log(startGraphDate);
+                console.log(endGraphDate);
+
+                var x_pos = d3.scaleTime()
+                        //   .domain(d3.extent(data, function (d) { return d.date; }))
+                        //   .domain([startGraphDate, maxDate])
+                        .domain([minDate, maxDate])
+                        .range([margin.left, width-margin.right]);
+
+                // HORIZONTAL SCALING WORKS CORRECTLY
+                var testDate = new Date(2020, 5, 1);
+                console.log(x_pos(testDate));
+                console.log(x_pos(minDate));
+                console.log(x_pos(maxDate));
+                console.log(typeof (x_pos));
+
+                // VERTICAL AXIS POSITIONS SCALED FROM MIN TO MAX INFECTIONS
+                var y_pos = d3.scaleLinear()
+                    // .domain([0, d3.max(data, function (d) { return +d.infections; })])
+                    .domain([0, 900000])
+                    .range([height, 0]);
+
+                var pop_percent = 100 * 900000/328000000;
+                var y_right = d3.scaleLinear()
+                    .domain([0, pop_percent])
+                    .range([height, 0]);
+
+                // VERTICAL SCALING WORKS CORRECTLY
+                console.log('min infections positioned at: ', y_pos(minInfections));
+                console.log('max infections positioned at: ', y_pos(maxInfections));
+                console.log(y_pos(500000));
+
+                // CREATE LINE GENERATOR
+                var line = d3.line()
+                    .x(function (d) { return x_pos(d.date); }) // x values
+                    .y(function (d) { return y_pos(d.infections); }) // y values
+                    .curve(d3.curveMonotoneX); // smoothing
+                console.log('line is a ', typeof (line));
+                
+                // APPEND SVG TO THE DIV
+                var svg = d3.select("#ghost-infections")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    // .style('background-color', 'pink')
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                
+                // ADD THE AXES
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(" + margin.left + "," + height + ")")
+                    // .tickArguments([5])
+                    // .tickCenterLabel(true)
+                    .call(d3.axisBottom(x_pos));
+                console.log('height: ', height, 'width: ', width);
+
+                svg.append("g")
+                    .attr("class", "y left")
+                    .attr("transform", "translate(" + margin.left + "," + 0 + ")")
+                   .call(d3.axisLeft(y_pos));
+                console.log(svg);
+
+                svg.append("g")
+                   .attr("class", "y right")
+                   .attr("transform", "translate(" + width + "," + 0 + ")")
+                   .call(d3.axisRight(y_right));
+
+                // // 9. Append the path, bind the data, and call the line generator 
+                // svg.append("path")
+                //     .datum(data) // 10. Binds data to the line 
+                //     .attr("class", "line") // Assign a class for styling 
+                //     // .attr("fill", "none")
+                //     // .attr("outline", "black")
+                //     .attr("d", line); // 11. Calls the line generator 
+
+                // CHECK ADDING LINE IN D3 V5
+                svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 2.0)
+                    .attr("d", d3.line()
+                        .x(function (d) { return x_pos(d.date) })
+                        .y(function (d) { return y_pos(d.infections) })
+                    );
+                
+                // ANNOTATION
+                svg.append("g")
+                    .append("text")
+                    .attr("x", 430)
+                    .attr("y", 250)
+                    .text("premature reopening")
+                    .style("font-size", "12px");
+                svg.append("g")
+                    .append("text")
+                    .attr("x", 100)
+                    .attr("y", 200)
+                    .text("uncoordinated")
+                    .style("font-size", "12px");
+                svg.append("g")
+                    .append("text")
+                    .attr("x", 100)
+                    .attr("y", 215)
+                    .text("initial response")
+                    .style("font-size", "12px");
+                svg.append("g")
+                    .append("text")
+                    .attr("x", 300)
+                    .attr("y", 200)
+                    .text("concerted")
+                    .style("font-size", "12px");
+                svg.append("g")
+                    .append("text")
+                    .attr("x", 280)
+                    .attr("y", 210)
+                    .text("quarantine period")
+                    .style("font-size", "12px");
+                svg.append("g")
+                    .append("line")
+                    .attr("x1", 140)
+                    .attr("x2", 200)
+                    .attr("y1", 230)
+                    .attr("y2", 320)
+                    .attr("stroke", "black");
+                svg.append("g")
+                    .append("line")
+                    .attr("x1", 325)
+                    .attr("x2", 330)
+                    .attr("y1", 215)
+                    .attr("y2", 265)
+                    .attr("stroke", "black");
+                svg.append("g")
+                    .append("line")
+                    .attr("x1", 490)
+                    .attr("x2", 455)
+                    .attr("y1", 230)
+                    .attr("y2", 150)
+                    .attr("stroke", "black");
+
+                // ADD TITLE
+                svg.append("text")
+                    .attr("x", (width / 2))
+                    .attr("y", 20 )
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "20px")
+                    .style("stroke", "none") .text("Ghost Infections in the U.S. During");
+                svg.append("text")
+                    .attr("x", (width / 2))
+                    .attr("y", 45)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "20px")
+                    .style("stroke", "none").text("the 2020 Covid-19 Pandemic");
+
+                // ADD LEFT AXIS LABEL
+                    svg.append("g")
+                    .append("text")
+                    .attr("x", -300)
+                    .attr("y", 0)
+                    .text("Total Non-Symptomatic Infections")
+                    .attr("transform", "rotate(-90)")
+                    .style("font-size", "12px");
+
+                // ADD RIGHT AXIS LABEL
+                svg.append("g")
+                    .append("text")
+                    .attr("x", -300)
+                    .attr("y", width+50)
+                    .text("Percent of U.S. Population Non-Symptomatic")
+                    .attr("transform", "rotate(-90)")
+                    .style("font-size", "12px");
+            });
+
+
+                // Features of the annotation
+                // const annotations = [
+                // {
+                //     note: {
+                //     label: "",
+                //     title: "Uncoordinated response"
+                //     },
+                //     x: 225,
+                //     y: 225,
+                //     dy: -75,
+                //     dx: -25
+                // },
+                //             {
+                //     note: {
+                //         label: "",
+                //         title: "Quarantine phase"
+                //     },
+                //     x: 300,
+                //     y: 275,
+                //     dy: 40,
+                //     dx: 25,
+                //     subject: { radius: 50, radiusPadding: 10 }
+                // },
+                //     {
+                //         note: {
+                //             label: "",
+                //             title: "Premature reopening"
+                //         },
+                //         x: 400,
+                //         y: 175,
+                //         dy: -40,
+                //         dx: -40
+                //     }
+                // ]
+
+                // Add annotation to the chart
+                // const makeAnnotations = d3.annotation()
+                // .annotations(annotations)
+                // svg.append("g")
+                // .call(makeAnnotations)
+                //             });
+    </script>
+</body>
+</html>

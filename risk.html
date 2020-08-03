@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID GHOST INFECTIONS</title>
+    <!-- <link rel="stylesheet" type="text/css" href="alternate.css">
+    <link rel="stylesheet" type="text/css" href="main.css"> -->
+    <link rel="stylesheet" type="text/css" href="alternate.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="margins.rtf">
+    
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+     <!-- CODE FOR BINOMIAL -->
+    <script type="text/javascript" src="binomial.js"></script>
+        <script src='https://d3js.org/d3.v5.min.js'></script>
+        <script src='https://cdn.jsdelivr.net/npm/mathjs@7.1.0/dist/math.min.js'></script>
+        <style>
+            rect {
+                fill: rgb(197, 104, 88);
+                stroke: black;
+            }
+        </style>
+</head>
+<body onload="computeRisk()">
+    <header>
+        <div class="top_banner">
+            <h1 class="top_banner">Estimating the Risk of COVID-19 Exposure</h1>
+        </div>
+        <nav>
+            <ul>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="index.html">(1) Purpose >> </a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="parameters.html">(2) Estimation Logic >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="zombies.html">(3) Non-Symptomatic Infections >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="risk.html">(4) Exposure Risk</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="explan">
+        <h3>Calculating the risk of exposure</h3>
+        <p>This page lets you see how likely you are to be in close
+            proximity to a presymptomatic or asymptomatic person at a given
+            event or in a given confined location. Values are computed using the most recent "ghost infection" value based on
+            default assumptions about the percentage of people and the disease pathway. You may change the number of infections
+            to see how that affects exposure risk.
+        </p>
+        </div>
+
+        <div class="new-sxn" id="exposure-risk">
+           <h3>Percent chance of having 0 to 5 infected but non-symptomatic people present.</h3>
+           <p>If no one is infected, situation is good (green). Greater numbers of infected people would increase the risk of exposure.</p>
+        </div>
+
+        <div id="IOcontainer">
+            <div id="input">
+            <form id="input-form">
+                <label class="risk-label" for="people">Num people:</label><br>
+                <input class="risk-input" type="number" id="people" value="100"><br>
+                <label class="risk-label" for="infections">Non-symptomatic infections in US:</label><br>
+                <input class="risk-input" type="number" id="infections" value="800000">
+                <button class="button" type="button" id="recompute" onclick="computeRisk()">Recompute</button>
+            </form>
+        </div>
+            <div id="output">
+                <form id="output-form">
+                    <label class="risk-label" for="pop-percent">Percent US pop infected:</label><br>
+                    <input class="risk-output" type="text" id="pop-percent" value=""><br>
+                    <label class="risk-label" for="total-risk">Total risk:</label><br>
+                    <input class="risk-output" type="text" id="total-risk" value="">
+                    <!-- <button type="button" id="clear" onclick="clearSVG()">Reset</button> -->
+                </form>
+            </div>
+        </div>
+        <div id="bar-div">
+            <svg class="bar_chart" width=400 height=300></svg>
+        </div>
+
+    </main>
+    <script>
+        var chart = d3.select("svg");
+        let data = [];
+
+        // CLEAR THE SVG
+        function clearSVG() {
+           console.log('calling clearSVG()');
+           const bars = d3.select("svg")
+           .selectAll('.bars').remove();
+           const yaxis = d3.select("svg")
+           .select(".y-axis").remove();
+           data = [];
+           chart.selectAll("*").remove();
+        }
+
+        function computeRisk() {
+            clearSVG();
+            var people = document.getElementById("people").value;
+            if (people < 5 | people > 170) {
+                alert('Must choose a number from 6 to 170.');
+                clearSVG();
+            }
+            else {
+                var infections = document.getElementById("infections").value;
+
+                if (infections > 30000000) {
+                    alert('Must choose a number below 30 million.');
+                }
+                else {
+
+                }
+                // DO THE BINOMIAL COMPUTATIONS HERE
+                var pop_percent = (infections / 328000000).toFixed(4);
+                var pop_percent_txt = (100 * pop_percent).toString() + "%";
+                console.log(pop_percent_txt);
+                document.getElementById("pop-percent").value = pop_percent_txt;
+                document.getElementById("total-risk").value = 'total risk';
+                // let data = [];
+
+                var count = 0;
+                let bp = 0;
+                for (var i = 0; i <= 5; i += 1) {
+                    // console.log('i ', i, 'people ', people, 'pop_percent', pop_percent);
+                    bp = 100 * binomialpmf(people, i, pop_percent);
+                    data.push(bp.toFixed(4));
+                };
+                // FIND TOTAL CHANCE OF EXPOSURE
+                console.log('data', data);
+                let total_risk = ((1 - data[0] / 100).toFixed(2) * 100);
+                var risk_str = total_risk.toString();
+                document.getElementById("total-risk").value = risk_str + "%";
+
+                // COMPUTE MAX Y HEIGHT
+                var max_y = Math.max(...data);
+                var flr = Math.floor((max_y / 10));
+                console.log('floor ', flr);
+                max_y = 10 * (flr + 1);
+                if (max_y > 100) { max_y = 100 ;};
+                console.log('max_y ', max_y);
+
+                // PLACE BAR GRAPH
+                let my_orange = "#ce3b2a"
+                var color = ["green", "my_orange", "my_orange", "red", "red", "red"];
+                var height = 200;
+                var width = 200;
+                var x = d3.scaleBand().domain([0, 1, 2, 3, 4, 5]).range([0, width]);
+                var y = d3.scaleLinear().domain([0, max_y]).range([height, 0]);
+                // var y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+                var barwidth = x.bandwidth();
+                // var chart = d3.select("svg");
+
+                chart.append("g").attr("transform", "translate(50,50)")
+                    .selectAll("rect")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bars")
+                    .attr("x", function (d, i) { return x(i); })
+                    .attr("y", function (d) { return y(d); })
+                    .attr("width", barwidth)
+                    .attr("height", function (d) { return height - y(d); })
+                    .style("fill", function (d, i) { return color[i]; });
+
+                chart.append("g").attr("transform", "translate(50,50)")
+                    .attr("class", "y-axis")
+                    .call(d3.axisLeft(y));
+
+                chart.append("g").attr("transform", "translate(50,250)")
+                    .call(d3.axisBottom(x));
+
+                chart.append("g").append("text")
+                    .attr("x", 150)
+                    .attr("y", (height + 90))
+                    .style("text-anchor", "middle")
+                    .style("text-size", "15px")
+                    .text("Number of Infected Persons");
+
+                chart.append("g").append("text")
+                    .attr("x", 10)
+                    .attr("y", 150)
+                    .style("text-anchor", "middle")
+                    .style("text-size", "10px")
+                    .text("%");
+            };           
+
+        };
+    </script>
+</body>
+</html>

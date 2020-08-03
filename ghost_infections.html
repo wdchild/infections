@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>NON-SYMPTOMATIC COVID INFECTIONS</title>
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<meta charset="utf-8" />
+</head>
+<body>
+	<main>
+		<div id="ghost_infections">
+		</div>
+	</main>
+
+
+	<script type="text/javascript">
+		var source = "ghost_infections.csv"
+		var data = d3.csv(source, function(d) {
+			console.log(source);
+			console.log(d.date, d.infections);
+		})
+
+		// Get the data
+		// text_data = document.getElementById("test_data").innerHTML
+		// console.log(text_data)
+		// var data = d3.csv(text_data, function(d) {
+		// 	console.log(d.date, d.value);
+		// 	});
+// 		var data = d3.csv.parseRows(date,value
+
+// );
+// d3.csv('/Users/danielchild/Desktop/DATA\ VISUALIZATION/NARRATIVE\ VIZ\ PROJECT/SAMPLES/ghost_infections.csv', d3.autoType)
+//   .then(function (data) {
+//     console.log(data)
+//   });
+
+
+	</script>
+</body>
+</html>

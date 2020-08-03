@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NON-SYMPTOMATIC COVID INFECTIONS</title>
+    <!-- <link rel="stylesheet" type="text/css" href="alternate.css">
+    <link rel="stylesheet" type="text/css" href="main.css"> -->
+    <link rel="stylesheet" type="text/css" href="alternate.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="margins.rtf">
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+</head>
+<body>
+<header>
+    <div class="top_banner">
+        <h1 class="top_banner">Estimating the Risk of COVID-19 Exposure</h1>
+    </div>
+        <nav>
+            <ul>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="index.html">(1) Purpose >> </a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="parameters.html">(2) Estimation Logic >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="zombies.html">(3) Non-Symptomatic Infections >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="risk.html">(4) Exposure Risk</a>
+                </li>
+            </ul>
+        </nav>
+</header>
+<main>
+    <div class="explan">
+    <h3>Possible Disease Outcomes</h3>
+    <p>Imagine that 100 people are exposed on day 0 to the virus. Experts say that on average the average presymptomatic phase
+    is about 5 days. About 45 of those people will get no noticeable symptoms at all. The other 55 will get sick to varying
+    degrees. Of those who do get sick, 35 will feel like they have some kind of flu or cold and will be fine in 14 days or
+    thereabouts. The other 20 may require hospitalization, and of those 20, 3 - 5 never recover and eventually die from the
+    infection. The figure at right shows roughly how these outcomes play out on this hypothetical unit of 100 people.
+    Understanding this enables you to see how it is possible to eventually compute the number of people who are sick at any
+    given time in the population at large.</p>
+    <br>
+    </div>
+    <!-- <div class="tree">
+        <svg id="tree"></svg>
+    </div> -->
+    
+    <div class="img"><img src="possible_outcomes.png" alt=""></div>
+
+    <div class="explan">
+        <h3>Implications of Testing Data</h3>
+        <p>One of the statistics routinely reported is the number of "new COVID cases", meaning the number of people that have newly tested positive for the disease. How do these numbers fit into our model of the number of "hidden zombies" at large, as well as the number of people</p>
+        <br>
+        <p>One assumption I am making is that very few people will be getting tested for no reason, and that most of them will be getting tested because they feel unwell. This is not strictly true, but absent numbers on what percentage of people are getting tested without symptoms (e.g. in nursing homes or health care facilities), we will go with that assumption for now.
+        </p>
+        <br>
+        </p>While there's no way to know exactly which day in their timeline they got tested, we can can assume a default value (say day 5) and then play around with our later computations by alterating those values interactively.</p>
+        <br>
+        <p>To keep the numbers simple, imagine 65 people test positive. Assume that they all got infected 5 days earlier. Then that means the original number of infected people was 100, and that now 45 asymptomatic people are running around infecting others but not aware that they are contageous.</p>
+        <br>
+        <p>Again, simplifying on reality a little, now imagine that another 100 people test positive the next day. This same pattern repeats itself, though now you've added another 100 people getting infected, with those 100 eventually splitting off into the different disease trajectories.</p>
+        <br>
+        <p>Now, if you test on day 15, the numbers add up differently. You have 5 days worth of 100 people (500 total presymptomatic), but you also have one day of 45 people (asymptomatics). We can continue this pattern all the way to day 20, and you will end up having a kind of matrix where 20 sets of values move down on an excel sheet, and the total number sick asymptomatics on day 20 can be computed.</p>
+        <br>
+    </div>
+    <script>
+
+        // var treeData = [
+        //   {
+        //     "name": "Exposed",
+        //     "parent": "null",
+        //     "value": 100,
+        //     "type": "black",
+        //     "level": "red",
+        //     "children": [
+        //       {
+        //         "name": "Symptomatic",
+        //         "parent": "Exposed",
+        //         "value": 55,
+        //         "type": "grey",
+        //         "level": "red",
+        //         "children": [
+        //           {
+        //             "name": "Flu Symptoms Only",
+        //             "parent": "Symptomatic",
+        //             "value": 35,
+        //             "type": "steelblue",
+        //             "level": "orange"
+        //           },
+        //           {
+        //             "name": "Hospitalized But Survive",
+        //             "parent": "Symptomatic",
+        //             "value": 15,
+        //             "type": "steelblue",
+        //             "level": "red"
+        //           }
+        //           {
+        //             "name": "Hospitalized and Succumb",
+        //             "parent": "Symptomatic",
+        //             "value": 5,
+        //             "type": "steelblue",
+        //             "level": "red"
+        //           }
+        //         ]
+        //       },
+        //       {
+        //         "name": "Asymptomatic",
+        //         "parent": "Exposed",
+        //         "value": 45,
+        //         "type": "grey",
+        //         "level": "green"
+        //       }
+        //     ]
+        //   }
+        // ];
+
+        var treeData = [
+            {
+                "name": "Top Level",
+                "parent": "null",
+                "value": 10,
+                "type": "black",
+                "level": "red",
+                "children": [
+                    {
+                        "name": "Level 2: A",
+                        "parent": "Top Level",
+                        "value": 15,
+                        "type": "grey",
+                        "level": "red",
+                        "children": [
+                            {
+                                "name": "Son of A",
+                                "parent": "Level 2: A",
+                                "value": 5,
+                                "type": "steelblue",
+                                "level": "orange"
+                            },
+                            {
+                                "name": "Daughter of A",
+                                "parent": "Level 2: A",
+                                "value": 8,
+                                "type": "steelblue",
+                                "level": "red"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Level 2: B",
+                        "parent": "Top Level",
+                        "value": 10,
+                        "type": "grey",
+                        "level": "green"
+                    }
+                ]
+            }
+        ];
+
+
+        // ************** Generate the tree diagram	 *****************
+        var margin = { top: 20, right: 120, bottom: 20, left: 120 },
+            width = 960 - margin.right - margin.left,
+            height = 500 - margin.top - margin.bottom;
+
+        var i = 0;
+
+        var tree = d3.layout.tree()
+            .size([height, width]);
+
+        var diagonal = d3.svg.diagonal()
+            .projection(function (d) { return [d.y, d.x]; });
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.right + margin.left)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        root = treeData[0];
+
+        update(root);
+
+        function update(source) {
+
+            // Compute the new tree layout.
+            var nodes = tree.nodes(root).reverse(),
+                links = tree.links(nodes);
+
+            // Normalize for fixed-depth.
+            nodes.forEach(function (d) { d.y = d.depth * 180; });
+
+            // Declare the nodes…
+            var node = svg.selectAll("g.node")
+                .data(nodes, function (d) { return d.id || (d.id = ++i); });
+
+            // Enter the nodes.
+            var nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function (d) {
+                    return "translate(" + d.y + "," + d.x + ")";
+                });
+
+            nodeEnter.append("circle")
+                .attr("r", function (d) { return d.value; })
+                .style("stroke", function (d) { return d.type; })
+                .style("fill", function (d) { return d.level; });
+
+            nodeEnter.append("text")
+                .attr("x", function (d) {
+                    return d.children || d._children ?
+                        (d.value + 4) * -1 : d.value + 4
+                })
+                .attr("dy", ".35em")
+                .attr("text-anchor", function (d) {
+                    return d.children || d._children ? "end" : "start";
+                })
+                .text(function (d) { return d.name; })
+                .style("fill-opacity", 1);
+
+            // Declare the links…
+            var link = svg.selectAll("path.link")
+                .data(links, function (d) { return d.target.id; });
+
+            // Enter the links.
+            link.enter().insert("path", "g")
+                .attr("class", "link")
+                .style("stroke", function (d) { return d.target.level; })
+                .attr("d", diagonal);
+        }
+
+    </script>
+</main>
+</body>
+</html>

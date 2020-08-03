@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NON-SYMPTOMATIC COVID INFECTIONS</title>
+
+    <link rel="stylesheet" type="text/css" href="alternate.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <!-- <link rel="stylesheet" type="text/css" href="margins.rtf"> -->
+
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+</head>
+<body>
+    <header>
+        <div class="top_banner">
+            <h1 class="top_banner">Non-Symptomatic Infections and the Risk of COVID-19 Exposure</h1>
+        </div>
+        <nav>
+            <ul>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="index.html">(1) Purpose >> </a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="parameters.html">(2) Estimation Logic >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="zombies.html">(3) Non-Symptomatic Infections >></a>
+                </li>
+                <li class="dropdown" onclick="">
+                    <a class="white" href="risk.html">(4) Exposure Risk</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="explan">
+            <h3>Purpose</h3>
+            <p>Although the number of total infections and total deaths from COVID-19 are routinely reported in the media,
+            surprisingly, there is very little information on how many people are infected at any given moment in time. Daily media
+            reports routinely include the number of new cases and deaths per day or new cases and deaths per week, as well as the
+            total numbers of cases and deaths since the pandemic began. The total number of infected people in the population
+            large at any given time is not really known, however, and so naturally that number is not reported.</p>
+            <br>    
+            <p>The purpose of this website is twofold. First, it provides a model for estimating the number of <strong>non-symptomatic infections</strong>&#8212;namely, the number of people in the
+            population who are infected and potentially spreading the disease without knowing it in the U.S. population at large. This is done by taking newly identified COVID-19 cases extrapolating from that number to three infection stages:  <strong>presymptomatic</strong>, <strong>asymptomatic</strong>, and <strong>symptomatic</strong>. By combining these extrapolated figures with average timelines for the course of the disease at various stages, this model makes it possible to estimate the number of secretly infectious COVID-19 carriers in the population at large. These, after all, are the primary drivers of the virus's spread to new
+            portions of the population, and should be the people of greatest concern when it comes to keeping the disease at bay.</p>
+            <br>
+            <p>The model is driven using parameters estimated by medical and infectious disease experts in the field. Because differing  parameter values have been reported over time by different sources, interactive tools are also provided to allow the reader to see what happens when these parameters change.</p>
+            <br>
+            <p>Finally, using the model, it becomes possible to determine the likelihood of being in close contact with an asymptomatic
+            or presymptomatic person under certain circumstances, such as on an airplane. This too is facilitated with interactive
+            visualization tools.</p>
+        </div>
+        
+        <div id="container">
+            <div id="outcomes_piechart"></div>
+            <div id="tooltip"></div>
+        </div>
+
+            
+        <div class="explan">
+        <h4>Outcome Parameters</h4>
+        <p>When estimating the number of people at large who may be infecting others but do not appear to be sick, one has to begin with a breakdown of disease outcomes. The actual breakdown of outcomes tends to differ by country, and outcome values have also been changing over time as treatment protocols improve. The values shown below were once considered pretty typical, and will therefore be used as default values for the estimation model. (Hover over pie segments to see additional information.)</p>
+        </div>
+
+        <div class="explan">
+        <h3>Sources</h3>
+        <p>Data on daily reported cases was obtained from the <a href="https://covid19.who.int/info"> World Health
+                Organization</a>.</p>
+        <br>
+        <p>Evidence that presymptomatic and asymptomatic carriers can spread the disease is given by the <a
+                href="https://wwwnc.cdc.gov/eid/article/26/7/20-1595_article#:~:text=Recent%20epidemiologic%2C%20virologic%2C,symptoms%20never%20develop).">
+                Center for Disease Control</a>.</p>
+        </div>
+    </main>
+<script>
+    // CHART DIMENSIONS
+    let width = 450;
+    let height = 450;
+    let margin = 20;
+
+    // RADIUS
+    let radius = height/2 - 2.0*margin
+
+    // APPEND SVG TO THE DIV
+    let svg = d3.select("#outcomes_piechart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        // .style('background-color', 'pink')                    
+        .append("g")
+        .attr("transform", "translate(" + width/2 + "," + height/2+ ")");
+
+    // DISEASE OUTCOME DATA AND COLORS TO USE FOR CHART
+    var tooltip_data = { asymptomatic: 'Several European studies estimate that 41 - 45% of people are asymptomatic.', flu: 'Some report only mild cold symptoms, others a variety of flu symptoms', serious: 'Serious cases typically require hospitalization', fatal: 'Fatality rates vary by age and country, from 1% to 9%.'};
+    var data = { asymptomatic: 45, flu: 35, serious: 16, fatal: 4 }
+    let my_orange = "#ce3b2a"
+    let my_maroon = "#ad035d"
+    var colors = ["blue", my_orange, my_maroon, "indigo"];
+
+    // GROUP POSITIONS ON THE PIE
+    var pie = d3.pie()
+        .value(function (d) { return d.value; })
+    var angles = pie(d3.entries(data))
+    console.log(angles);
+
+    // BUILD A TOOLTIP
+    var tooltip = d3.select('#tooltip') // this is actually a div
+            .attr('class', 'tooltip')
+            .style('opacity', 9);
+
+    // GENERATOR FOR ARCS
+    var arcGenerator = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius)
+
+    // BUILD CHART USING SLICES
+    svg
+        .selectAll('slices')
+        .data(angles)
+        .enter()
+        .append('path')
+        .attr('d', arcGenerator)
+        .attr('fill', function(d, i) { return colors[i]})
+        .attr("stroke", "navy")
+        .style("stroke-width", "2px")
+        .style("opacity", 0.7)
+        .on('mouseover', function (d, i) {
+            tooltip.style('display', 'inline')
+            .style('float', 'left')
+            .style('background-color', 'steelblue' )
+            .style('opacity', .9)
+            .html(tooltip_data[d.data.key])
+            .transition(2000);
+        })
+        .on('mouseout', function () {
+            tooltip.style('display', 'none')
+            // .transition(100);
+        });
+
+    // ADD TEXT TO EACH SLICE USING CENTROIDS
+    svg
+        .selectAll('slices')
+        .data(angles)
+        .enter()
+        .append('text')
+        .text(function (d) {
+            let str = d.data.key + " " + String(d.data.value) + "%";
+            return str
+        })
+        .attr("transform", function (d) { return "translate(" + arcGenerator.centroid(d) + ")"; })
+        .style("text-anchor", "middle")
+        .style("font-size", 14)
+        .style("fill", "#fff");
+
+    // ADD A TITLE TO THE FIGURE
+    svg.append("g").append("text")
+            .attr("x", 0)
+            .attr("y", 215)
+            .style("text-anchor", "middle")
+            .style("text-size", "10px")
+            .style("font-weight", "bold")
+            .text("Typical COVID-19 Outcomes");
+</script>
+</body>
+</html>

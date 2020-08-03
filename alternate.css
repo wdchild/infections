@@ -1,0 +1,255 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  margin: 0; padding: 0;  /* to avoid scrollbars */
+}
+
+body {
+	padding: 0px;
+	border: 0px;
+	font-family: Avenir, sans-serif;
+	height: 100%;
+}
+
+div.top_banner {
+	position: fixed;
+	top: 0;
+	z-index: 20;
+	display: block;
+	height: 60px;
+	background-color: black;
+	width: 100%;
+	color: white;
+}
+
+img.top_banner, p.top_banner {
+	float: left;
+	height: 50px;
+}
+
+img.top_banner {
+	float: left;
+	display: inline-block;
+	padding-left: 20px;
+	padding-top: 5px;
+	height: 50px;
+}
+
+ p.top_banner {
+	padding-top: 25px;
+	padding-left: 20px;
+	font-size: 14px;
+	float: left;
+	height: 30px;
+}
+
+/* @media only screen and (min-width: 800px){ /* 800 px or greater */
+/*	div.top_banner {
+		display: none;
+	}
+}  */
+
+nav {
+	position: fixed;
+	top: 60px;
+	z-index: 10;
+	background-color: rgb(128, 19, 35);
+	height: 50px;
+	color: white;
+	width: 100%;
+}
+
+ul {
+	list-style-type: none;
+}
+
+li {
+	float: left;
+	height: 50px;
+	width: 33.333%;
+	text-align: center;
+	line-height: 50px;
+}
+
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown:hover {
+	background-color: rgb(128, 19, 35);
+	font-weight: bold;
+  cursor: pointer;
+}
+
+.dropdown_content {
+	display: none;
+	position: absolute;
+	background-color: rgb(119, 19, 35);
+	z-index: 30;
+	width: 100%;
+}
+
+.dropdown:hover .dropdown_content {
+	display: block;
+  cursor: pointer;
+}
+
+.dropdown_content a {
+	display: block;
+	width: 100%;
+	padding: 0;
+}
+
+.dropdown_content a:hover {
+	background-color: rgb(97, 55, 66);
+	font-weight: 999;
+  cursor: pointer;
+}
+
+li a {
+  display: inline-block;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  padding: 5px;
+  font-family: "Avenir";
+}
+
+/*Hide dropdown links until they are needed*/
+li ul {
+  display: hidden;
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+/*Make dropdown links vertical*/
+li ul li {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
+main {
+	position: absolute;
+	top: 110px;
+	box-sizing: border-box;
+	min-height: 100%;
+	background-color: rgb(255, 255, 250); /* was "pink" rgb(255, 220, 251); */
+	overflow-y: scroll;
+	width: 100%;
+  	padding-bottom: 70px;
+}
+
+.main_container{
+	display: block;
+	width: 90%;
+	padding:5%;
+	min-height: 900px;
+}
+
+.leftside_image {
+	float: left;
+	width: 45%;
+	padding: 2.5%;
+	height: auto%;
+}
+
+.right_side_text {
+	width: 45%;
+	padding: 2.5%;
+	display: block;
+	float: right;
+	height: auto%;
+	flex-shrink: 1;
+	overflow: auto;
+}
+
+.right_side_text p {
+	padding-top: .4em;
+	padding-bottom: .4em;
+	font-size: 1em;
+}
+
+
+@media only screen and (max-width: 700px) {
+	.main_container {
+		width: 90%;
+		padding: 5%;
+	}
+	.leftside_image, .right_side_text {
+		width: 90%;
+		padding: 5%;
+		height: auto;
+		float: left;
+	}
+}
+
+/* @media only screen and (max-width: 400px) {
+	.main_container {
+		width: 80%;
+		padding: 10%;
+	}
+		.leftside_image, .right_side_text {
+		width: 100%;
+		height: auto;
+		float: none;
+	}
+} */
+
+footer {
+	position: fixed;
+	width: 100%;
+	left: 0;
+	bottom: 0;
+	height: 60px;
+	background-color: black;
+}
+
+footer ul {
+	height: 50px;
+	margin: 0;
+}
+
+footer ul li {
+	display: inline-block;
+	float-left;
+	margin: 0;
+	width: auto;
+}
+
+footer li a {
+	font-size: 1em;
+	line-height: 60px;
+	padding: 3px 10px 3px 10px;
+}
+
+footer li a:hover {
+	background-color: rgb(33, 28, 28)
+  cursor: pointer;
+}
+
+footer #logo {
+	height: 40px;
+	padding-top: 10px;
+	float: right;
+	padding-right: 5px;
+	position: absolute;
+    right: 20px;
+}
+
+footer #service {
+	height: 55px;
+    float: right;
+    position: absolute;
+    right: 80px;
+    max-width: 50%;
+}
+
+#bar-div {
+	margin-left: 80px;
+}
